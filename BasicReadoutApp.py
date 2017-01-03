@@ -15,7 +15,6 @@ import time
 import numpy as np
 import sys
 
-
 if sys.version_info < (3, 0):
     # Python 2
     import Tkinter as tk
@@ -25,7 +24,7 @@ else:
     # Python 3
     import tkinter as tk
     from tkinter import messagebox as ms
-    #import tkinter.ttk as ttk
+    # import tkinter.ttk as ttk
 
 # Set the path and name for the file where the data will be wirtten
 # the file name will be of the form: path+"%Y-%m-%d_%H:%M:%S"+extension
@@ -35,19 +34,20 @@ else:
 # form fields
 fields = ['Duration in (s)',
           'Path (use the absolute path)',
-          'Extension (should be a .txt file)',
+          'Extension (.txt). The data will be written in a file with name of the form:       \n'
+          'path+"Y-m-d_H:M:S"+extension ("/Data/2016-11-10_10:20:50_Readout.txt")',
           'Using Calibrator (1 for yes, 0 for No)',
           'Angle of the horn from horizontal perpendicular to support axis (usually 90)',
           'Angle of the horn from horizontal parallel to support axis',
-          'Temperature outside in celcius',
-          'Temperature of the Calibrator in celcius',
+          'Temperature outside (in celsius)',
+          'Temperature of the Calibrator (in celsius)',
           'Weather',
-          'Units of reading',
+          'Units of power measurements (look up in analog multimeter)',
           'Comments']
 
 # default values for the form's fields
-defaultVal = ['60*2', '/Users/cosmology/Google Drive/Projects/radiometer/Data/', '_Readout.txt', '1', '90', '20', '14.0',
-              '-50', 'very clear', 'nanoWatt', '']
+defaultVal = ['60*2', '/Users/cosmology/Google Drive/Projects/radiometer/Data/',
+              '_Readout.txt', '1', '90', '20', '14.0', '-50', 'very clear', 'nanoWatt', '']
 # global variables
 data = []
 title = ''
@@ -55,21 +55,28 @@ multimeter = Rd.Readout()
 header = ''
 duration = 0
 
-def makeform(r, f):
+
+def makeform():
     # creates a form in the tk window r with the fields given by f
     entries = []
-    i = 0
-    for field in f:
-        row = tk.Frame(r)
-        lab = tk.Label(row, width=55, text=field, anchor='w')
-        ent = tk.Entry(row)
-        row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        lab.pack(side=tk.LEFT)
-        ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
-        # put default value
+    for i in range(len(fields)):
+        tk.Label(root, text=fields[i], anchor='nw', justify=tk.LEFT).grid(row=i, column=0, columnspan=2, sticky=tk.W, padx=5, pady=5)
+        ent = tk.Entry(root)
+        ent.grid(row=i, column=2, padx=5, pady=5, sticky='we')
         ent.insert(0, defaultVal[i])
         entries.append(ent)
-        i += 1
+    # i = 0
+    # for field in fields:
+    #     row = tk.Frame(root)
+    #     lab = tk.Label(row, width=60, text=field, anchor='nw', justify=tk.LEFT)
+    #     ent = tk.Entry(row)
+    #     row.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+    #     lab.pack(side=tk.LEFT)
+    #     ent.pack(side=tk.RIGHT, expand=tk.YES, fill=tk.X)
+    #     # put default value
+    #     ent.insert(0, defaultVal[i])
+    #     entries.append(ent)
+    #     i += 1
     return entries
 
 
@@ -124,7 +131,7 @@ def record(entries):
     # Create a new multimeter of the class Readout to read data
     # global multimeter
     # multimeter = Rd.Readout()
-    #pb.start(1000)
+    # pb.start(1000)
     print('Reading Data...')
     #tk.Message(root,text='Reading Data...',width=55).pack(side=tk.LEFT)
     # Read for the duration set
@@ -153,21 +160,20 @@ def writefile():
 
 if __name__ == '__main__':
     root = tk.Tk()
-    root.title('Multimeter Measurments')
+    root.title('Multimeter Measurements')
     # size of window
-    root.geometry("900x500")
+    root.geometry("1000x500")
+    root.grid_columnconfigure(2, weight=1)
+    # root.attributes("-topmost", True)
+    # root.attributes("-topmost", False)
     # make the form
-    ents = makeform(root, fields)
-    #frame = ttk.Frame()
-    #frame.pack(expand=True, fill=tk.BOTH, side=tk.TOP)
-    #pb = ttk.Progressbar(frame, mode='indeterminate')
-    #pb.pack(expand=True, fill=tk.BOTH, side=tk.LEFT, padx=5, pady=5)
+    ents = makeform()
     try:
         # record data when Return key is entered
         root.bind('<Return>', (lambda event, e=ents: record(e)))
         # create button to start measuring
         b1 = tk.Button(root, text='Start Measurement', command=(lambda e=ents: record(e)))
-        b1.pack(side=tk.LEFT, padx=5, pady=5)
+        b1.grid(row=len(fields), column=0, padx=5, pady=5, sticky=tk.W)
     except EOFError:
         # CTRL-C is pressed while reading or writing the data
         writefile()
@@ -177,5 +183,5 @@ if __name__ == '__main__':
     # b2.pack(side=tk.LEFT, padx=5, pady=5)
     # button to quit
     b3 = tk.Button(root, text='Quit', command=root.quit)
-    b3.pack(side=tk.LEFT, padx=5, pady=5)
+    b3.grid(row=len(fields), column=1, padx=5, pady=5, sticky=tk.W)
     root.mainloop()
