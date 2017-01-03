@@ -37,6 +37,7 @@ For more information, this [tutorial](https://www.metachris.com/2015/11/create-s
 
 - Check that the multimeter is connected
 - Open the BasicRedoutApp.app application using Finder or from the terminal found in folder `dist/`
+- Click on the application icon on the dock to bring the window forward
 - Fill in the different fields. Make sure the path is correct
 - Press Start Measurement button
 
